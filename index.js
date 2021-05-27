@@ -16,6 +16,7 @@ function getMeters(i) {
 app.intent('get_restaurant', (conv, {location, proximity, cuisine}) => {
       const axios = require('axios');
       var api_key = "<YOUR_API_KEY_HERE>";
+  //Replace <YOUR_API_KEY_HERE> (line 18) with the API key you generated in the previous step.//
       var user_location = JSON.stringify(location["street-address"]);
       var user_proximity;
       if (proximity.unit == "mi") {
@@ -24,6 +25,7 @@ app.intent('get_restaurant', (conv, {location, proximity, cuisine}) => {
         user_proximity = JSON.stringify(proximity.amount * 1000);
       }
       var geo_code = "https://maps.googleapis.com/maps/api/geocode/json?address=" + encodeURIComponent(user_location) + "&region=<YOUR_REGION>&key=" + api_key;
+  //Replace <YOUR_REGION> (line 26) with your ccTLD (country code top-level domain).//
       return axios.get(geo_code)
         .then(response => {
           var places_information = response.data.results[0].geometry.location;
@@ -52,3 +54,4 @@ app.intent('get_restaurant', (conv, {location, proximity, cuisine}) => {
 });
 
 exports.get_restaurant = functions.https.onRequest(app);
+
