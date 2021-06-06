@@ -22,7 +22,29 @@ def magic_eight_ball(request):
     ]
 
     magic_eight_ball_response = random.choice(choices)
+    
+    
+    request_json = request.get_json()
 
+    if request_json and 'queryResult' in request_json:
+        question = request_json.get('queryResult').get('queryText')
+
+    # try to identify the language
+    language = 'en'
+    translate_client = translate.Client()
+    detected_language = translate_client.detect_language(question)
+    if detected_language['language'] == 'und':
+        language = 'en'
+    elif detected_language['language'] != 'en':
+        language = detected_language['language']
+
+    # translate if not english
+    if language != 'en':
+        logging.info('translating from en to %s' % language)
+        translated_text = translate_client.translate(
+             magic_eight_ball_response, target_language=language)
+        magic_eight_ball_response = translated_text['translatedText']
+    
     logging.info(magic_eight_ball_response)
 
     return make_response(jsonify({'fulfillmentText': magic_eight_ball_response }))
